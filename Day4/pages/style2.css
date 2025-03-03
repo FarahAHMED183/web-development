@@ -1,0 +1,34 @@
+.parent{
+    display:flex;
+    justify-content: center;
+    justify-items: center;
+    margin:70px 450px;
+    margin-top: 100px;
+    background-color: rgb(242, 236, 236);
+    color: rgb(137, 212, 238);
+    position: relative;
+    font-size: 95px;
+    width: 500px;
+    height: 350px;
+    align-items: center;
+
+}
+
+.parent::before{
+    content: "";
+    background-color: rgb(221, 42, 131);
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-5deg);
+}
+.parent::after{
+    content: "";
+    background-color: rgb(77, 179, 230);
+    position: absolute;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    transform: rotate(5deg);
+}
