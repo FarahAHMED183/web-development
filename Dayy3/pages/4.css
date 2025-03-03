@@ -1,0 +1,33 @@
+p {
+    padding: 15px;
+}
+
+.note1 {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background-color: gainsboro;
+    padding: 10px;
+    margin: 15px;
+    font-size: larger;
+    height: 80px;
+}
+
+
+.note1::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 5px;
+    height: 85%;  
+    left: 0;  
+}
+
+
+#n1::before {
+    background-color: rgb(222, 109, 147);
+}
+
+#n2::before {
+    background-color: rgb(78, 203, 190);
+}
