@@ -1,0 +1,51 @@
+.parent{
+    display: flex;
+    flex-flow: row wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: rgb(240, 238, 238);
+    height: 250px;
+    width: 600px;
+    justify-items: center;
+}
+
+.parent div{
+    margin: 10px;
+    padding: 10px;
+    background-color: rgb(234, 55, 55);
+    color: aliceblue;
+}
+
+.item1{
+    
+    align-self: flex-start;
+    width: 120px;
+    text-align: center;
+}
+.item2{
+    
+    align-self: flex-start;
+    width: 120px;
+    text-align: center;
+}
+.item3{
+    align-self: flex-start;
+    width: 120px;
+    text-align: center;
+}
+.item4{
+    align-self: flex-end;
+    width: 120px;
+    text-align: center;
+}
+.item5{
+    align-self: flex-end;
+    width: 120px;
+    text-align: center;
+}
+.item6{
+    align-self: flex-end;
+    width: 120px;
+    text-align: center;
+}

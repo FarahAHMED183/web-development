@@ -1,0 +1,51 @@
+
+.parent{
+    display: flex;
+    flex-flow: row wrap;
+    height: 250px;
+    padding: 10px;
+    background-color: lightgray;
+    width: 500px;
+    gap: 0;
+}
+.parent div{
+    background-color: gray;
+    color: gainsboro;
+    margin: 10px;
+    padding: 10px;
+    font-size: larger;
+    text-align: center;
+    gap: 0;
+    
+    
+}
+.item1{
+    align-self: flex-start;
+    width: 120px;
+}
+.item2{
+    align-self: flex-start;
+    width: 120px;
+}
+.item3{
+    align-self: flex-start;
+    width: 120px;
+}
+.item4{
+    width: 120px;
+    align-self: stretch;
+    line-height: 8;
+    
+}
+.item5{
+    
+    width: 120px;
+    align-self: stretch;
+    line-height: 8;
+}
+.item6{
+    
+    width: 120px;
+    align-self: stretch;
+    line-height: 8;
+}
