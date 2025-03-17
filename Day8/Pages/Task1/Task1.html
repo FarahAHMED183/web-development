@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* Inputs Style */
+        input, select {
+            padding: 10px;
+            margin: 10px;
+            border: none;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: rgb(42, 147, 115);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+
+    
+            /* Section Style */
+            section {
+            padding: 15px;
+            margin: 10px 0;
+            background-color: orangered;
+            border-radius: 8px;
+            font-size: 18px;
+            color: whitesmoke;
+            font-weight: bold;
+            text-align: center;
+            width: fit-content;
+            justify-content: center;
+            
+        }
+
+        /* Paragraph Style */
+        p {
+            padding: 15px;
+            margin: 10px 0;
+            background-color: orangered;
+            border-radius: 8px;
+            font-size: 18px;
+            color: whitesmoke;
+            font-weight: bold;
+            text-align: center;
+            width: fit-content;
+        }
+
+    </style>
+</head>
+<body>
+    <input type="number" id="num" placeholder="Enter num">
+    <input type="text" id="content" placeholder="Enter content">
+    
+    <select id="elementType">
+        <option value="section">Section</option>
+        <option value="p">Paragraph</option>
+    </select>
+    <button onclick="createElements()">Create</button>
+
+    <div id="div3"></div>
+
+    <script src="Task3.js"></script>
+</body>
+</html>
