@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",  // Or "ES2016", "ES2017", etc. - any version >= ES2015
+    "module": "CommonJS", // Or your preferred module system (e.g., "ESNext")
+    "outDir": "./dist",   // Optional: Output directory for compiled JavaScript
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2015", "DOM"] // Make sure to include "ES2015" in the "lib" array
+  },
+  "include": ["./*.ts"],
+  "exclude": ["node_modules"]
+}
