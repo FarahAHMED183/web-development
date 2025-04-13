@@ -1,0 +1,228 @@
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #E0E0E0;
+}
+
+.container {
+  margin: 0 auto;
+  width: 95%;
+}
+
+.signup-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #f3f1f1;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 100vh;
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+    padding: 30px 20px;
+  }
+
+  .imagee {
+    flex: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 80px;
+
+    @media (max-width: 992px) {
+      padding-left: 0;
+      margin-bottom: 30px;
+    }
+
+    img {
+      max-width: 100%;
+      height: 70vh;
+      
+
+      @media (max-width: 768px) {
+        max-width: 90%;
+      }
+    }
+  }
+
+  .form-section {
+    flex: 2;
+    max-width: 500px;
+    padding: 100px;
+    margin-right: 80px;
+
+    @media (max-width: 1200px) {
+      margin-right: 40px;
+      padding: 80px 60px;
+    }
+
+    @media (max-width: 992px) {
+      padding: 60px 30px;
+      margin-right: 0;
+    }
+
+    @media (max-width: 576px) {
+      padding: 40px 20px;
+    }
+
+    .logo {
+      position: absolute;
+      font-size: 24px;
+      font-weight: 600;
+      color: #2a2a2a;
+      right: 120px;
+      top: 50px;
+
+      @media (max-width: 768px) {
+        right: 20px;
+        top: 20px;
+        font-size: 20px;
+      }
+
+      img {
+        height: 20px;
+        align-items: center;
+      }
+    }
+
+    h2 {
+      margin: 0 0 10px;
+    }
+
+    p {
+      margin-bottom: 20px;
+      color: #777;
+      font-size: 14px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      .double {
+        display: flex;
+        gap: 20px;
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+      }
+
+      .form-group {
+        position: relative;
+        flex: 1;
+        padding: 8px;
+
+        input {
+          width: 100%;
+          padding: 15px;
+          font-size: 14px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          background: transparent;
+        }
+
+        label {
+          position: absolute;
+          top: 50%;
+          left: 20px;
+          transform: translateY(-50%);
+          background: #f3f1f1;
+          padding: 0 5px;
+          font-size: 14px;
+          color: #777;
+          transition: 0.2s ease;
+          pointer-events: none;
+        }
+
+        input:focus + label,
+        input:not(:placeholder-shown) + label {
+          top: 0;
+          font-size: 12px;
+          left: 15px;
+          color: #2962ff;
+        }
+      }
+
+      .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+
+        span {
+          color: #f11b2d;
+          cursor: pointer;
+        }
+      }
+
+      button[type="submit"] {
+        padding: 12px;
+        background-color: #2962ff;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+          background-color: #0039cb;
+        }
+      }
+
+      .login-link {
+        font-size: 14px;
+        text-align: center;
+
+        a {
+          color: #f11b2d;
+          text-decoration: none;
+        }
+      }
+
+      .options {
+        align-items: center;
+        text-align: center;
+        color: #a1a0a0;
+      }
+
+      .social-signup {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        margin-top: 20px;
+        justify-content: center;
+
+        @media (max-width: 576px) {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .social-button {
+          width: 150px;
+          height: 40px;
+          border-radius: 3px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #2962ff;
+
+          img {
+            width: 20px;
+            height: 20px;
+          }
+
+          &:hover {
+            border: 1px solid #2346a8;
+          }
+        }
+      }
+    }
+  }
+}
