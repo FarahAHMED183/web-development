@@ -8,43 +8,53 @@ import {
   IconButton,
   Paper
 } from "@mui/material";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
-function App() {
-  const [inputVal, setInputVal] = useState("");
-  const [todos, setTodos] = useState([]);
-  const [isEdited, setIsEdited] = useState(false);
-  const [editedId, setEditedId] = useState(null);
+// Define interfaces for TypeScript
+interface TodoItem {
+  val: string;
+  isDone: boolean;
+  id: number;
+}
 
-  const onChange = (e) => setInputVal(e.target.value);
+function App() {
+  const [inputVal, setInputVal] = useState<string>("");
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [isEdited, setIsEdited] = useState<boolean>(false);
+  const [editedId, setEditedId] = useState<number | null>(null);
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => setInputVal(e.target.value);
 
   const handleClick = () => {
     if (!isEdited) {
-      setTodos([...todos, { val: inputVal, isDone: false, id: new Date().getTime() }]);
-    } else {
+      setTodos([...todos, { val: inputVal, isDone: false, id: Date.now() }]);
+    } else if (editedId !== null) {
       setTodos(todos.map(todo => todo.id === editedId ? { ...todo, val: inputVal } : todo));
     }
     setInputVal("");
     setIsEdited(false);
+    setEditedId(null);
   };
 
-  const onDelete = (id) => {
+  const handleDelete = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const handleDone = (id) => {
+  const handleDone = (id: number) => {
     setTodos(todos.map(todo => todo.id === id ? { ...todo, isDone: !todo.isDone } : todo));
   };
 
-  const handleEdit = (id) => {
+  const handleEdit = (id: number) => {
     const todo = todos.find((todo) => todo.id === id);
-    setEditedId(todo.id);
-    setInputVal(todo.val);
-    setIsEdited(true);
+    if (todo) {
+      setEditedId(todo.id);
+      setInputVal(todo.val);
+      setIsEdited(true);
+    }
   };
 
   return (
@@ -70,7 +80,7 @@ function App() {
           <Button
             variant="contained"
             onClick={handleClick}
-            disabled={!inputVal}
+            disabled={!inputVal.trim()}
             sx={{
               height: "56px",
               minWidth: "100px",
@@ -119,7 +129,7 @@ function App() {
                 <IconButton onClick={() => handleEdit(todo.id)} sx={{ color: "#555" }}>
                   <EditIcon fontSize="small" />
                 </IconButton>
-                <IconButton onClick={() => onDelete(todo.id)} sx={{ color: "#d32f2f" }}>
+                <IconButton onClick={() => handleDelete(todo.id)} sx={{ color: "#d32f2f" }}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Box>
