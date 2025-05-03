@@ -1,4 +1,4 @@
-// src/api/userApi.ts
+
 import axios from 'axios';
 import { ApiResponse, User, UserWithDetails } from '../types/types';
 

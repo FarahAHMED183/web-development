@@ -1,4 +1,4 @@
-// src/components/TeamList.tsx
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
