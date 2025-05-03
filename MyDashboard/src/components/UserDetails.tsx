@@ -1,4 +1,4 @@
-// src/components/UserDetails.tsx
+
 import React from 'react';
 import {
   Box,

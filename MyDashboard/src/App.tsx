@@ -1,11 +1,11 @@
-// src/App.tsx
+
 import React from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import TopBar from './components/TopBar';
 import TeamList from './components/TeamList';
 import Sidebar from './components/Sidebar';
 
-// Create a theme instance
+
 const theme = createTheme({
   palette: {
     primary: {
