@@ -31,7 +31,7 @@ import {
   Add as AddIcon,
   ViewList as ViewListIcon
 } from '@mui/icons-material';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getUsers } from '../api/userApi';
 import UserDetails from './UserDetails';
 
