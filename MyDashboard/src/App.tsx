@@ -1,11 +1,8 @@
-
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import queryClient from './queryClient';
-
 
 const theme = createTheme({
   palette: {
@@ -61,7 +58,6 @@ const App = () => {
           <Sidebar open={true} />
           <Dashboard />
         </Box>
-  
       </QueryClientProvider>
     </ThemeProvider>
   );
