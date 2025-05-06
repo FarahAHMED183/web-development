@@ -1,5 +1,5 @@
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import { QueryClientProvider } from 'react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import queryClient from './queryClient';
