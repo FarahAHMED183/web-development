@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -21,7 +20,8 @@ import {
   Pagination,
   CircularProgress,
   Avatar,
-  Tooltip
+  Tooltip,
+  Skeleton
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -31,52 +31,51 @@ import {
   Add as AddIcon,
   ViewList as ViewListIcon
 } from '@mui/icons-material';
-import { UserWithDetails } from '../types/types';
+import { useQuery } from 'react-query';
 import { getUsers } from '../api/userApi';
 import UserDetails from './UserDetails';
 
 const ROWS_PER_PAGE = 10;
 
-const TeamList: React.FC = () => {
-  const [users, setUsers] = useState<UserWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
+const TeamList = () => {
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedUser, setExpandedUser] = useState<string | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+  const [expandedUser, setExpandedUser] = useState(null);
+  const [selectedUsers, setSelectedUsers] = useState(new Set());
   
-  useEffect(() => {
-    fetchUsers();
-  }, [page]);
-  
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const data = await getUsers(page, ROWS_PER_PAGE, searchQuery);
-      setUsers(data.users);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    } finally {
-      setLoading(false);
+  // Using React Query for data fetching
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = useQuery(
+    ['users', page, ROWS_PER_PAGE, searchQuery],
+    () => getUsers(page, ROWS_PER_PAGE, searchQuery),
+    {
+      keepPreviousData: true,
+      staleTime: 5 * 60 * 1000, 
     }
-  };
+  );
+  
+  const users = data?.users || [];
+  const totalPages = data?.totalPages || 0;
   
   const handleSearch = () => {
     setPage(1); // Reset to first page when searching
-    fetchUsers();
+    refetch();
   };
   
-  const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handleChangePage = (event, value) => {
     setPage(value);
   };
   
-  const handleExpandUser = (userId: string) => {
+  const handleExpandUser = (userId) => {
     setExpandedUser(expandedUser === userId ? null : userId);
   };
   
-  const handleToggleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToggleSelectAll = (event) => {
     if (event.target.checked) {
       const newSelected = new Set(selectedUsers);
       users.forEach(user => newSelected.add(user.login.uuid));
@@ -86,7 +85,7 @@ const TeamList: React.FC = () => {
     }
   };
   
-  const handleToggleSelect = (userId: string) => {
+  const handleToggleSelect = (userId) => {
     const newSelected = new Set(selectedUsers);
     if (selectedUsers.has(userId)) {
       newSelected.delete(userId);
@@ -96,19 +95,47 @@ const TeamList: React.FC = () => {
     setSelectedUsers(newSelected);
   };
   
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
   
-  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+  const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
   
-  const getFullName = (user: UserWithDetails) => {
+  const getFullName = (user) => {
     return `${user.name.first} ${user.name.last}`;
   };
+
+  // Skeleton loader for a row
+  const UserRowSkeleton = () => (
+    <TableRow>
+      <TableCell padding="checkbox">
+        <Skeleton variant="rectangular" width={24} height={24} />
+      </TableCell>
+      <TableCell>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Skeleton variant="circular" width={40} height={40} sx={{ mr: 1 }} />
+          <Skeleton variant="text" width={120} />
+        </Box>
+      </TableCell>
+      <TableCell><Skeleton variant="text" width={100} /></TableCell>
+      <TableCell><Skeleton variant="text" width={100} /></TableCell>
+      <TableCell><Skeleton variant="text" width={180} /></TableCell>
+      <TableCell><Skeleton variant="text" width={120} /></TableCell>
+      <TableCell>
+        <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 1 }} />
+      </TableCell>
+      <TableCell>
+        <Box sx={{ display: 'flex' }}>
+          <Skeleton variant="circular" width={30} height={30} sx={{ mr: 1 }} />
+          <Skeleton variant="circular" width={30} height={30} />
+        </Box>
+      </TableCell>
+    </TableRow>
+  );
 
   return (
     <Box sx={{ p: 3, backgroundColor: '#f9fafb', minHeight: 'calc(100vh - 64px)', width: '100%' }}>
@@ -137,9 +164,22 @@ const TeamList: React.FC = () => {
                   <SearchIcon sx={{ color: '#9ca3af' }} />
                 </InputAdornment>
               ),
+              endAdornment: isLoading && (
+                <InputAdornment position="end">
+                  <CircularProgress size={20} />
+                </InputAdornment>
+              ),
             }}
             sx={{ mr: 2, backgroundColor: 'white' }}
           />
+          <Button 
+            variant="outlined" 
+            size="small" 
+            onClick={handleSearch} 
+            sx={{ mr: 2 }}
+          >
+            Search
+          </Button>
           <ViewListIcon sx={{ color: '#9ca3af', ml: 1 }} />
           <Typography sx={{ ml: 2, color: '#6b7280' }}>
             {selectedUsers.size > 0 ? `${selectedUsers.size} Selected` : ''}
@@ -185,16 +225,27 @@ const TeamList: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {loading ? (
+              {isLoading ? (
+                
+                Array(5).fill(0).map((_, index) => <UserRowSkeleton key={index} />)
+              ) : isError ? (
                 <TableRow>
                   <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
-                    <CircularProgress />
+                    <Typography color="error">Error loading data: {error?.message || 'Unknown error'}</Typography>
+                    <Button 
+                      variant="outlined" 
+                      color="primary" 
+                      sx={{ mt: 1 }} 
+                      onClick={() => refetch()}
+                    >
+                      Retry
+                    </Button>
                   </TableCell>
                 </TableRow>
               ) : users.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
-                    No users found
+                    <Typography>No users found</Typography>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -291,16 +342,25 @@ const TeamList: React.FC = () => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
-              {`${page} - ${Math.min(page, totalPages)} of ${totalPages}`}
-            </Typography>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handleChangePage}
-              shape="rounded"
-              size="small"
-            />
+            {isLoading ? (
+              <Skeleton variant="text" width={80} />
+            ) : (
+              <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+                {`${page} - ${Math.min(page, totalPages)} of ${totalPages}`}
+              </Typography>
+            )}
+            {isLoading ? (
+              <Skeleton variant="rectangular" width={200} height={32} sx={{ borderRadius: 1 }} />
+            ) : (
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handleChangePage}
+                shape="rounded"
+                size="small"
+                disabled={isLoading}
+              />
+            )}
           </Box>
         </Box>
       </Paper>
