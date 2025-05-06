@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import TopBar from './components/TopBar';
-import TeamList from './components/TeamList';
+import { QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 import Sidebar from './components/Sidebar';
-
+import Dashboard from './pages/Dashboard';
+import queryClient from './queryClient';
 
 const theme = createTheme({
   palette: {
@@ -51,17 +51,17 @@ const theme = createTheme({
   },
 });
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-        <Sidebar open={true} />
-        <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-          <TopBar title="Team List" />
-          <TeamList />
+      <QueryClientProvider client={queryClient}>
+        <Box sx={{ display: 'flex' }}>
+          <Sidebar open={true} />
+          <Dashboard />
         </Box>
-      </Box>
+        {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+      </QueryClientProvider>
     </ThemeProvider>
   );
 };

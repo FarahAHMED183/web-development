@@ -1,59 +1,59 @@
+export const User = {
+  id: {
+    value: String,
+  },
+  name: {
+    first: String,
+    last: String,
+  },
+  email: String,
+  phone: String,
+  picture: {
+    medium: String,
+  },
+  location: {
+    street: {
+      number: Number,
+      name: String,
+    },
+    city: String,
+    state: String,
+    country: String,
+    postcode: String,
+  },
+  dob: {
+    date: String,
+  },
+  registered: {
+    date: String,
+  },
+  login: {
+    uuid: String,
+  },
+};
 
-export interface User {
-    id: {
-      value: string;
-    };
-    name: {
-      first: string;
-      last: string;
-    };
-    email: string;
-    phone: string;
-    picture: {
-      medium: string;
-    };
-    location: {
-      street: {
-        number: number;
-        name: string;
-      };
-      city: string;
-      state: string;
-      country: string;
-      postcode: string;
-    };
-    dob: {
-      date: string;
-    };
-    registered: {
-      date: string;
-    };
-    login: {
-      uuid: string;
-    };
-  }
-  
-  export interface ApiResponse {
-    results: User[];
-    info: {
-      page: number;
-      results: number;
-      seed: string;
-      version: string;
-    };
-  }
-  
-  export interface UserDetails {
-    officeLocation: string;
-    teamMates: string[];
-    birthday: string;
-    hrYear: string;
-    address: string;
-  }
-  
-  export interface UserWithDetails extends User {
-    position: string;
-    department: string;
-    status: 'Full Time' | 'Part Time';
-    details: UserDetails;
-  }
+export const ApiResponse = {
+  results: [User],
+  info: {
+    page: Number,
+    results: Number,
+    seed: String,
+    version: String,
+  },
+};
+
+export const UserDetails = {
+  officeLocation: String,
+  teamMates: [String],
+  birthday: String,
+  hrYear: String,
+  address: String,
+};
+
+export const UserWithDetails = {
+  ...User,
+  position: String,
+  department: String,
+  status: ['Full Time', 'Part Time'],
+  details: UserDetails,
+};
