@@ -4,33 +4,36 @@ using System.Collections.Generic;
 public class Person
 {
     public string Name { get; set; }
-    public string Gender { get; set; } 
+    public string Gender { get; set; }
+}
+
+public static class StackPersonExtensions
+{
+    public static Person GetFirst(this Stack<Person> stack, Predicate<Person> condition)
+    {
+        foreach (var person in stack)
+        {
+            if (condition(person))
+                return person;
+        }
+        return null;
+    }
 }
 
 public class Program
 {
-    
-    public static string GetFirstPerson(Queue<Person> people, Func<Person, bool> condition)
-    {
-        foreach (var person in people)
-        {
-            if (condition(person))
-            {
-                return person.Name; 
-            }
-        }
-        return "No match found";
-    }
-
     public static void Main(string[] args)
     {
-        Queue<Person> people = new Queue<Person>();
-        people.Enqueue(new Person { Name = "farah", Gender = "Female" });
-        people.Enqueue(new Person { Name = "ahmed", Gender = "Male" });
-        people.Enqueue(new Person { Name = "omar", Gender = "Male" });
+        var people = new Stack<Person>();
+        people.Push(new Person { Name = "Ali",       Gender = "Male" });
+        people.Push(new Person { Name = "Mohammed",  Gender = "Male" });
+        people.Push(new Person { Name = "Sara",      Gender = "Female" });
 
-       
-        string firstMale = GetFirstPerson(people, p => p.Gender == "Male");
-        Console.WriteLine(firstMale); 
+        Person firstMaleMohammed = people.GetFirst(p => p.Name == "Mohammed" && p.Gender == "Male");
+
+        if (firstMaleMohammed != null)
+            Console.WriteLine($"Found: {firstMaleMohammed.Name}, Gender: {firstMaleMohammed.Gender}");
+        else
+            Console.WriteLine("No matching person found");
     }
 }
