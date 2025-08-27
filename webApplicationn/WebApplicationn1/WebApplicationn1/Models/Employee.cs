@@ -9,11 +9,9 @@ public class Employee
     public string Phone { get; set; } = string.Empty;
 
     public int DepartmentId { get; set; }
-    public Department Department { get; set; }
-
     public int RoleId { get; set; }
-    public Role Role { get; set; }
-
-    public Login Login { get; set; }
+    public virtual Department Department { get; set; } = null!;
+    public virtual Role Role { get; set; } = null!;
+    public virtual Login? Login { get; set; }
     
 }

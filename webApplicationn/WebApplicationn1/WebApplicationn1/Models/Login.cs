@@ -7,5 +7,6 @@ public class Login
     public string Password { get; set; } = string.Empty;
 
     public int EmployeeId { get; set; }
-    public Employee Employee { get; set; }
+
+    public virtual Employee Employee { get; set; } = null!;
 }

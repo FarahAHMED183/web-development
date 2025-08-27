@@ -13,7 +13,7 @@ namespace WebApplicationn1.Mapping
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.Name))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Login.Username));
 
-            CreateMap<EmployeeCreateDto, Employee>();
+            CreateMap<EmployeeCreateDto, Employee>().ReverseMap();
         }
     }
 }

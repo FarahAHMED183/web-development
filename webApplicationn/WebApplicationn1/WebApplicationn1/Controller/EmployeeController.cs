@@ -9,56 +9,61 @@ namespace WebApplicationn1.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EmployeesController(ApplicationDbContext context, IMapper mapper) : ControllerBase
+    public class EmployeesController : ControllerBase
     {
-        [HttpPost]
-        public async Task<IActionResult> AddEmployee([FromBody] EmployeeCreateDto dto, CancellationToken cancellationToken)
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+
+        public EmployeesController(ApplicationDbContext context, IMapper mapper)
         {
-            var employee = mapper.Map<Employee>(dto);
+            _context = context;
+            _mapper = mapper;
+        }
 
-            await context.Employees.AddAsync(employee, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
+        [HttpPost]
+        public async Task<ActionResult<EmolyeeDto>> AddEmployee([FromBody] EmployeeCreateDto dto, CancellationToken cancellationToken)
+        {
+            var employee = _mapper.Map<Employee>(dto);
+            await _context.Employees.AddAsync(employee, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
-            var employeeReadDto = mapper.Map<EmolyeeDto>(employee);
-
+            var employeeReadDto = _mapper.Map<EmolyeeDto>(employee);
             return CreatedAtAction(nameof(GetEmployeeById), new { id = employee.Id }, employeeReadDto);
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmolyeeDto>>> GetEmployees(CancellationToken cancellationToken)
         {
-            var employees = await context.Employees
+            var employees = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Role)
                 .Include(e => e.Login)
                 .ToListAsync(cancellationToken);
 
-            return mapper.Map<List<EmolyeeDto>>(employees);
+            return Ok(_mapper.Map<IEnumerable<EmolyeeDto>>(employees));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EmolyeeDto>> GetEmployeeById(int id, CancellationToken cancellationToken)
         {
-            var employee = await context.Employees
+            var employee = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Role)
                 .Include(e => e.Login)
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
             if (employee == null) return NotFound();
-
-            return mapper.Map<EmolyeeDto>(employee);
+            return Ok(_mapper.Map<EmolyeeDto>(employee));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEmployee(int id, [FromBody] EmployeeCreateDto dto, CancellationToken cancellationToken)
         {
-            var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
             if (employee == null) return NotFound();
 
-            mapper.Map(dto, employee);
-
-            await context.SaveChangesAsync(cancellationToken);
+            _mapper.Map(dto, employee);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return NoContent();
         }
@@ -66,11 +71,11 @@ namespace WebApplicationn1.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id, CancellationToken cancellationToken)
         {
-            var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
             if (employee == null) return NotFound();
 
-            context.Employees.Remove(employee);
-            await context.SaveChangesAsync(cancellationToken);
+            _context.Employees.Remove(employee);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return NoContent();
         }
