@@ -9,9 +9,10 @@ namespace WebApplication2.Mapping
         public EmployeeProfile()
         {
             CreateMap<Employee, EmployeeDto>()
-                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name));
-
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom<EmployeeImageUrlResolver>());
             CreateMap<EmployeeCreateDto, Employee>();
+
         }
     }
 }

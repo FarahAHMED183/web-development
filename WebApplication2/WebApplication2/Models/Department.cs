@@ -8,4 +8,8 @@ public class Department
 
     public virtual ICollection<Employee> Employees { get; set; }
     public virtual ICollection<Project> Projects { get; set; }
+    // Manager (optional)
+    public int? ManagerId { get; set; }
+    public Employee? Manager { get; set; }
+  
 }

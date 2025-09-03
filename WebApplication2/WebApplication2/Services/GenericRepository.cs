@@ -39,4 +39,8 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
     {
         return _context.Set<TEntity>().ToList();
     }
+    public IQueryable<TEntity> GetQueryable()
+    {
+        return _context.Set<TEntity>().AsQueryable();
+    }
 }

@@ -9,10 +9,11 @@ public class Employee
     public DateTime Doj { get; set; }
     public string Gender { get; set; }
     public string? ImagePath { get; set; }
+    
 
     public int DepartmentId { get; set; }
     public virtual Department Department { get; set; }
 
-    public virtual ICollection<Project> Projects { get; set; }
+    public ICollection<ProjectEmployee> ProjectEmployees { get; set; }
     public virtual ICollection<Dependent> Dependents { get; set; }
 }

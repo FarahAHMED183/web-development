@@ -3,77 +3,66 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.Dto;
+using WebApplication2.interfaces;
 using WebApplication2.Models;
 
-namespace WebApplication2.Controllers
+namespace WebApplication2.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class DepartmentsController(
+    ApplicationDbContext context,
+    IMapper mapper,
+    IGenericRepository<Department> departmentRepository
+) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class DepartmentsController(ApplicationDbContext context, IMapper mapper) : ControllerBase
+    [HttpPost]
+    public async Task<IActionResult> CreateDepartment(DepartmentCreateDto dto, CancellationToken cancellationToken)
     {
-        private readonly ApplicationDbContext _context = context;
-        private readonly IMapper _mapper = mapper;
+        var department = mapper.Map<Department>(dto);
+        departmentRepository.Add(department);
+        await context.SaveChangesAsync(cancellationToken);
+        return Ok("Department created successfully");
+    }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
-        {
-            return await _context.Departments.ToListAsync();
-        }
+    [HttpGet]
+    public async Task<IActionResult> GetDepartments(int pageNumber = 1, int pageSize = 10)
+    {
+        var query = departmentRepository.GetQueryable();
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Department>> GetDepartment(int id)
-        {
-            var department = await _context.Departments.FindAsync(id);
+        var items = await query
+            .OrderBy(d => d.D_No)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
 
-            if (department == null)
-            {
-                return NotFound();
-            }
+        var departments = mapper.Map<IEnumerable<DepartmentReadDto>>(items);
+        return Ok(departments);
+    }
 
-            return department;
-        }
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateDepartment(int id, DepartmentCreateDto dto, CancellationToken cancellationToken)
+    {
+        var department = await departmentRepository.GetQueryable().FirstOrDefaultAsync(d => d.D_No == id, cancellationToken);
+        if (department == null) return NotFound();
 
-        [HttpPost]
-        public async Task<ActionResult<Department>> CreateDepartment([FromBody] DepartmentCreateDto departmentDto)
-        {
-            var department = _mapper.Map<Department>(departmentDto);
+        mapper.Map(dto, department);
 
-            _context.Departments.Add(department);
-            await _context.SaveChangesAsync();
+        departmentRepository.Update(department);
+        await context.SaveChangesAsync(cancellationToken);
 
-            return CreatedAtAction(nameof(GetDepartment), new { id = department.D_No }, department);
-        }
+        return Ok("Department updated successfully");
+    }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentCreateDto departmentDto)
-        {
-            var existingDepartment = await _context.Departments.FindAsync(id);
-            if (existingDepartment == null)
-            {
-                return NotFound();
-            }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteDepartment(int id, CancellationToken cancellationToken)
+    {
+        var department = await departmentRepository.GetQueryable().FirstOrDefaultAsync(d => d.D_No == id, cancellationToken);
+        if (department == null) return NotFound();
 
-            _mapper.Map(departmentDto, existingDepartment);
+        departmentRepository.Delete(department);
+        await context.SaveChangesAsync(cancellationToken);
 
-            _context.Entry(existingDepartment).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDepartment(int id)
-        {
-            var department = await _context.Departments.FindAsync(id);
-            if (department == null)
-            {
-                return NotFound();
-            }
-
-            _context.Departments.Remove(department);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }

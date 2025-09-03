@@ -7,4 +7,5 @@ public interface IGenericRepository<TEntity> where TEntity : class
     void Update(TEntity entity);
     TEntity? GetById(int id);
     IEnumerable<TEntity> GetAll();
+    IQueryable<TEntity> GetQueryable();
 }

@@ -1,76 +1,93 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication2.Interfaces;
-using WebApplication2.Models;
+using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.Dto;
+using WebApplication2.interfaces;
+using WebApplication2.Models;
 
-namespace WebApplication2.Controllers
+namespace WebApplication2.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class EmployeesController(
+    ApplicationDbContext context,
+    IMapper mapper,
+    IGenericRepository<Employee> employeeRepository
+) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class EmployeesController : ControllerBase
+    [HttpPost]
+    public async Task<IActionResult> CreateEmployee([FromForm] EmployeeCreateDto dto, CancellationToken cancellationToken)
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IFileUpload _fileUpload;
+        var employee = mapper.Map<Employee>(dto);
 
-        public EmployeesController(ApplicationDbContext context, IFileUpload fileUpload)
+        if (dto.Image != null)
         {
-            _context = context;
-            _fileUpload = fileUpload;
+            var fileName = $"{Guid.NewGuid()}_{dto.Image.FileName}";
+            var filePath = Path.Combine("wwwroot/images", fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await dto.Image.CopyToAsync(stream, cancellationToken);
+
+            employee.ImagePath = $"/images/{fileName}";
         }
 
-        [HttpPost("create")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Create([FromForm] EmployeeCreateDto dto)
+        employeeRepository.Add(employee);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return Ok("Employee created successfully");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetEmployees(int pageNumber = 1, int pageSize = 10)
+    {
+        var query = employeeRepository.GetQueryable()
+            .Include(e => e.Department);
+
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        var employees = mapper.Map<IEnumerable<EmployeeDto>>(items);
+        return Ok(employees);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateEmployee(int id, [FromForm] EmployeeCreateDto dto, CancellationToken cancellationToken)
+    {
+        var employee = await employeeRepository.GetQueryable().FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        if (employee == null) return NotFound();
+
+        mapper.Map(dto, employee);
+
+        if (dto.Image != null)
         {
-            if (dto == null) return BadRequest("Employee data is required.");
+            var fileName = $"{Guid.NewGuid()}_{dto.Image.FileName}";
+            var filePath = Path.Combine("wwwroot/images", fileName);
 
-            var employee = new Employee
-            {
-                Name = dto.Name,
-                Address = dto.Address,
-                Dob = dto.Dob,
-                Doj = dto.Doj,
-                Gender = dto.Gender,
-                DepartmentId = dto.DepartmentId
-            };
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await dto.Image.CopyToAsync(stream, cancellationToken);
 
-            if (dto.Image != null)
-            {
-                var path = await _fileUpload.UploadFileAsync(dto.Image, "employees");
-                employee.ImagePath = path;
-            }
-
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetById), new { id = employee.Id }, employee);
+            employee.ImagePath = $"/images/{fileName}";
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
-        {
-            var employees = _context.Employees.ToList();
-            return Ok(employees);
-        }
+        employeeRepository.Update(employee);
+        await context.SaveChangesAsync(cancellationToken);
 
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var employee = _context.Employees.Find(id);
-            if (employee == null) return NotFound();
-            return Ok(employee);
-        }
+        return Ok("Employee updated successfully");
+    }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null) return NotFound();
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteEmployee(int id, CancellationToken cancellationToken)
+    {
+        var employee = await employeeRepository.GetQueryable().FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        if (employee == null) return NotFound();
 
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
+        employeeRepository.Delete(employee);
+        await context.SaveChangesAsync(cancellationToken);
 
-            return NoContent();
-        }
+        return NoContent();
     }
 }

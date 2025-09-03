@@ -26,6 +26,8 @@ builder.Services.AddSwaggerGen();
 // Add services to the container
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IFileUpload, FileUpload>();
+builder.Services.AddHttpContextAccessor();
+
 
 var app = builder.Build();
 

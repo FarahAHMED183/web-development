@@ -8,7 +8,10 @@ namespace WebApplication2.Mapping
     {
         public ProjectProfile()
         {
-            CreateMap<Project, ProjectDto>();
+            CreateMap<ProjectCreateDto, Project>();
+            CreateMap<Project, ProjectReadDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.Name));
+
         }
     }
 }
