@@ -8,7 +8,10 @@ namespace WebApplication2.Mapping
     {
         public DepartmentProfile()
         {
-            CreateMap<Department, DepartmentDto>();
+            CreateMap<Department, DepartmentReadDto>()
+                .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.Manager != null ? src.Manager.Name : null));
+
+            CreateMap<DepartmentReadDto, Department>();
 
             CreateMap<DepartmentCreateDto, Department>();
         }

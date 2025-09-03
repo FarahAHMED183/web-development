@@ -9,5 +9,6 @@ public class Project
     public int DepartmentId { get; set; }
     public virtual Department Department { get; set; }
 
-    public virtual ICollection<Employee> Employees { get; set; }
+    public ICollection<ProjectEmployee> ProjectEmployees { get; set; }
 }
+

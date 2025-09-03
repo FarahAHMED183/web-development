@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.Dto;
 using WebApplication2.interfaces;
@@ -12,59 +13,56 @@ namespace WebApplication2.Controllers;
 public class ProjectsController(
     ApplicationDbContext context,
     IMapper mapper,
-    IGenericRepository<Project> projectRepository) : ControllerBase
+    IGenericRepository<Project> projectRepository
+) : ControllerBase
 {
-    [HttpGet]
-    public IActionResult GetProjects(int pageNumber = 1, int pageSize = 10)
-    {
-        var projects = projectRepository.GetAll()
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize);
-
-        return Ok(mapper.Map<IEnumerable<ProjectDto>>(projects));
-    }
-
-    [HttpGet("{id:int}")]
-    public IActionResult GetProjectById(int id)
-    {
-        var project = projectRepository.GetById(id);
-        if (project == null) return NotFound();
-
-        return Ok(mapper.Map<ProjectDto>(project));
-    }
-
     [HttpPost]
-    public async Task<IActionResult> CreateProject(ProjectDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateProject(ProjectCreateDto dto, CancellationToken cancellationToken)
     {
         var project = mapper.Map<Project>(dto);
-
         projectRepository.Add(project);
         await context.SaveChangesAsync(cancellationToken);
+        return Ok("Project created successfully");
+    }
 
-        return CreatedAtAction(nameof(GetProjectById), new { id = project.P_No }, mapper.Map<ProjectDto>(project));
+    [HttpGet]
+    public async Task<IActionResult> GetProjects(int pageNumber = 1, int pageSize = 10)
+    {
+        var query = projectRepository.GetQueryable()
+            .Include(p => p.Department);
+
+        var items = await query
+            .OrderBy(p => p.P_No)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        var projects = mapper.Map<IEnumerable<ProjectReadDto>>(items);
+        return Ok(projects);
     }
 
     [HttpPut("{id:int}")]
-    public IActionResult UpdateProject(int id, ProjectDto dto)
+    public async Task<IActionResult> UpdateProject(int id, ProjectCreateDto dto, CancellationToken cancellationToken)
     {
-        var project = projectRepository.GetById(id);
+        var project = await projectRepository.GetQueryable().FirstOrDefaultAsync(p => p.P_No == id, cancellationToken);
         if (project == null) return NotFound();
 
         mapper.Map(dto, project);
-        projectRepository.Update(project);
-        context.SaveChanges();
 
-        return Ok(mapper.Map<ProjectDto>(project));
+        projectRepository.Update(project);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return Ok("Project updated successfully");
     }
 
     [HttpDelete("{id:int}")]
-    public IActionResult DeleteProject(int id)
+    public async Task<IActionResult> DeleteProject(int id, CancellationToken cancellationToken)
     {
-        var project = projectRepository.GetById(id);
+        var project = await projectRepository.GetQueryable().FirstOrDefaultAsync(p => p.P_No == id, cancellationToken);
         if (project == null) return NotFound();
 
         projectRepository.Delete(project);
-        context.SaveChanges();
+        await context.SaveChangesAsync(cancellationToken);
 
         return NoContent();
     }

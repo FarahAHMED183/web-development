@@ -8,7 +8,9 @@ namespace WebApplication2.Mapping
     {
         public DependentProfile()
         {
-            CreateMap<Dependent, DependentDto>();
+            CreateMap<DependentCreateDto, Dependent>();
+            CreateMap<Dependent, DependentReadDto>() 
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
         }
     }
 }

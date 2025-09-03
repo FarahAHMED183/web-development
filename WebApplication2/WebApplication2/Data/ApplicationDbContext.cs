@@ -13,6 +13,7 @@ namespace WebApplication2.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Dependent>  Dependents { get; set; }
+        public DbSet<ProjectEmployee> ProjectEmployees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,7 @@ namespace WebApplication2.Data
             modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new DependentConfiguration());
+            modelBuilder.ApplyConfiguration(new ProjectEmployeeConfiguration());
         }
     }
 }
