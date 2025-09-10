@@ -26,5 +26,6 @@ global using CRUD_Operation.Features.Course.Command.Models;
 global using CRUD_Operation.Features.Course.Query.Models;
 global using CRUD_Operation.Features.Learn.Command.Models;
 global using CRUD_Operation.Features.Learn.Query.Models;
+global using CRUD_Operation.AppMetaData.BaseRouter;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
