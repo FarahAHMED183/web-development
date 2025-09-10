@@ -1,10 +1,10 @@
 namespace CRUD_Operation.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(Router.CourseController)]
     [ApiController]
     public class CourseController : BaseController
     {
-        [HttpGet]
+        [HttpGet(Router.GetAllCourses)]
         public async Task<IActionResult> GetAllCourses()
         {
             var request = new GetAllCoursesDto();
@@ -12,7 +12,7 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet(Router.GetCourseById)]
         public async Task<IActionResult> GetCourseById(int id)
         {
             var request = new GetCourseByIdDto { Id = id };
@@ -20,21 +20,22 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpPost]
+        [HttpPost(Router.CreateCourse)]
         public async Task<IActionResult> CreateCourse([FromBody] CourseDto request)
         {
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateCourse([FromBody] UpdateCourseDto request)
+        [HttpPut(Router.UpdateCourse)]
+        public async Task<IActionResult> UpdateCourse(int id, [FromBody] UpdateCourseDto request)
         {
+            request.Id = id;
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete(Router.DeleteCourse)]
         public async Task<IActionResult> DeleteCourse(int id)
         {
             var request = new DeleteCourseDto { Id = id };

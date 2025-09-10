@@ -1,10 +1,10 @@
 namespace CRUD_Operation.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(Router.LearnController)]
     [ApiController]
     public class LearnController : BaseController
     {
-        [HttpGet]
+        [HttpGet(Router.GetAllEnrollments)]
         public async Task<IActionResult> GetAllEnrollments()
         {
             var request = new GetAllEnrollmentsDto();
@@ -12,7 +12,7 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpGet("student/{studentId}")]
+        [HttpGet(Router.GetEnrollmentsByStudent)]
         public async Task<IActionResult> GetEnrollmentsByStudent(int studentId)
         {
             var request = new GetEnrollmentsByStudentDto { StudentId = studentId };
@@ -20,7 +20,7 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpGet("course/{courseId}")]
+        [HttpGet(Router.GetEnrollmentsByCourse)]
         public async Task<IActionResult> GetEnrollmentsByCourse(int courseId)
         {
             var request = new GetEnrollmentsByCourseDto { CourseId = courseId };
@@ -28,21 +28,21 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpPost("enroll")]
+        [HttpPost(Router.EnrollStudent)]
         public async Task<IActionResult> EnrollStudent([FromBody] EnrollStudentDto request)
         {
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpPost("unenroll")]
+        [HttpPost(Router.UnenrollStudent)]
         public async Task<IActionResult> UnenrollStudent([FromBody] UnenrollStudentDto request)
         {
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpPut("grade")]
+        [HttpPut(Router.UpdateGrade)]
         public async Task<IActionResult> UpdateGrade([FromBody] UpdateGradeDto request)
         {
             var response = await mediator.Send(request);
