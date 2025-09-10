@@ -4,6 +4,13 @@ namespace CRUD_Operation.Controllers
     [ApiController]
     public class StudentController : BaseController
     {
+        private readonly IStudentRepository _studentRepository;
+
+        public StudentController(IStudentRepository studentRepository)
+        {
+            _studentRepository = studentRepository;
+        }
+
         [HttpGet(Router.GetAllStudents)]
         public async Task<IActionResult> GetAllStudents()
         {
@@ -40,6 +47,36 @@ namespace CRUD_Operation.Controllers
         {
             var request = new DeleteStudentDto { Id = id };
             var response = await mediator.Send(request);
+            return Result(response);
+        }
+
+        [HttpGet(Router.SearchStudents)]
+        public async Task<IActionResult> SearchStudents([FromQuery] string? name = null, [FromQuery] int age = 0)
+        {
+            var studentDto = new StudentDto
+            {
+                Sname = name ?? "",
+                Age = age
+            };
+
+            var specification = new StudentSpecification(studentDto);
+            var students = await _studentRepository.GetBySpecification(specification);
+
+            var response = new Response
+            {
+                Status = true,
+                StatusCode = HttpStatusCode.OK,
+                Message = $"Found {students.Count} students matching criteria",
+                Data = students.Select(s => new
+                {
+                    s.Id,
+                    s.SID,
+                    s.Sname,
+                    s.Age,
+                    EnrolledCourses = s.Learns?.Count ?? 0
+                })
+            };
+
             return Result(response);
         }
     }

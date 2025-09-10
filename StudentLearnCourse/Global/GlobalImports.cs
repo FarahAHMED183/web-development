@@ -17,6 +17,8 @@ global using CRUD_Operation.Repositories.Interfaces;
 global using CRUD_Operation.Models;
 global using CRUD_Operation.Models.Base;
 global using CRUD_Operation.Global;
+global using CRUD_Operation.Specifications;
+global using CRUD_Operation.Specifications.Base;
 global using System.Net;
 global using System.Text.Json;
 global using AutoMapper;

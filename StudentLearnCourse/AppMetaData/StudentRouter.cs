@@ -8,5 +8,6 @@ namespace CRUD_Operation.AppMetaData.BaseRouter
         public const string CreateStudent = "Create";
         public const string UpdateStudent = "Update/{id}";
         public const string DeleteStudent = "Delete/{id}";
+        public const string SearchStudents = "Search";
     }
 }

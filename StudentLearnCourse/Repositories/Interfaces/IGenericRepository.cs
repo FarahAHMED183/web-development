@@ -11,5 +11,10 @@
         public Task Update(TEntity entity);
 
         public Task Delete(TEntity entity);
+
+        // Specification methods
+        public Task<List<TEntity>> GetBySpecification(IBaseSpecification<TEntity> specification);
+        public Task<TEntity?> GetFirstBySpecification(IBaseSpecification<TEntity> specification);
+        public Task<int> CountBySpecification(IBaseSpecification<TEntity> specification);
     }
 }
