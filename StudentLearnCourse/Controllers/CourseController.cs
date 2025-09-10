@@ -4,6 +4,13 @@ namespace CRUD_Operation.Controllers
     [ApiController]
     public class CourseController : BaseController
     {
+        private readonly ICourseRepository _courseRepository;
+
+        public CourseController(ICourseRepository courseRepository)
+        {
+            _courseRepository = courseRepository;
+        }
+
         [HttpGet(Router.GetAllCourses)]
         public async Task<IActionResult> GetAllCourses()
         {
@@ -40,6 +47,36 @@ namespace CRUD_Operation.Controllers
         {
             var request = new DeleteCourseDto { Id = id };
             var response = await mediator.Send(request);
+            return Result(response);
+        }
+
+        [HttpGet(Router.SearchCourses)]
+        public async Task<IActionResult> SearchCourses([FromQuery] string? name = null, [FromQuery] int hours = 0)
+        {
+            var courseDto = new CourseDto
+            {
+                Cname = name ?? "",
+                Hours = hours
+            };
+
+            var specification = new CourseSpecification(courseDto);
+            var courses = await _courseRepository.GetBySpecification(specification);
+
+            var response = new Response
+            {
+                Status = true,
+                StatusCode = HttpStatusCode.OK,
+                Message = $"Found {courses.Count} courses matching criteria",
+                Data = courses.Select(c => new
+                {
+                    c.Id,
+                    c.Code,
+                    c.Cname,
+                    c.Hours,
+                    EnrolledStudents = c.Learns?.Count ?? 0
+                })
+            };
+
             return Result(response);
         }
     }
