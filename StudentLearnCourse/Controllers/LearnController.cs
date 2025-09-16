@@ -1,18 +1,16 @@
 namespace CRUD_Operation.Controllers
 {
-    [Route(Router.LearnController)]
     [ApiController]
     public class LearnController : BaseController
     {
-        [HttpGet(Router.GetAllEnrollments)]
-        public async Task<IActionResult> GetAllEnrollments()
+        [HttpGet(Router.LearnRouter.GetAllEnrollments)]
+        public async Task<IActionResult> GetAllEnrollments([FromQuery] GetAllEnrollmentsDto request)
         {
-            var request = new GetAllEnrollmentsDto();
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpGet(Router.GetEnrollmentsByStudent)]
+        [HttpGet(Router.LearnRouter.GetEnrollmentsByStudent)]
         public async Task<IActionResult> GetEnrollmentsByStudent(int studentId)
         {
             var request = new GetEnrollmentsByStudentDto { StudentId = studentId };
@@ -20,7 +18,7 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpGet(Router.GetEnrollmentsByCourse)]
+        [HttpGet(Router.LearnRouter.GetEnrollmentsByCourse)]
         public async Task<IActionResult> GetEnrollmentsByCourse(int courseId)
         {
             var request = new GetEnrollmentsByCourseDto { CourseId = courseId };
@@ -28,21 +26,21 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpPost(Router.EnrollStudent)]
+        [HttpPost(Router.LearnRouter.EnrollStudent)]
         public async Task<IActionResult> EnrollStudent([FromBody] EnrollStudentDto request)
         {
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpPost(Router.UnenrollStudent)]
+        [HttpPost(Router.LearnRouter.UnenrollStudent)]
         public async Task<IActionResult> UnenrollStudent([FromBody] UnenrollStudentDto request)
         {
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpPut(Router.UpdateGrade)]
+        [HttpPut(Router.LearnRouter.UpdateGrade)]
         public async Task<IActionResult> UpdateGrade([FromBody] UpdateGradeDto request)
         {
             var response = await mediator.Send(request);

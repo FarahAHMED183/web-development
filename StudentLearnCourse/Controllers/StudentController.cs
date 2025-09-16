@@ -1,25 +1,16 @@
 namespace CRUD_Operation.Controllers
 {
-    [Route(Router.StudentController)]
     [ApiController]
     public class StudentController : BaseController
     {
-        private readonly IStudentRepository _studentRepository;
-
-        public StudentController(IStudentRepository studentRepository)
+        [HttpGet(Router.StudentRouter.GetAllStudents)]
+        public async Task<IActionResult> GetAllStudents([FromQuery] GetAllStudentsDto request)
         {
-            _studentRepository = studentRepository;
-        }
-
-        [HttpGet(Router.GetAllStudents)]
-        public async Task<IActionResult> GetAllStudents()
-        {
-            var request = new GetAllStudentsDto();
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpGet(Router.GetStudentById)]
+        [HttpGet(Router.StudentRouter.GetStudentById)]
         public async Task<IActionResult> GetStudentById(int id)
         {
             var request = new GetStudentByIdDto { Id = id };
@@ -27,14 +18,14 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpPost(Router.CreateStudent)]
+        [HttpPost(Router.StudentRouter.CreateStudent)]
         public async Task<IActionResult> CreateStudent([FromBody] StudentDto request)
         {
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpPut(Router.UpdateStudent)]
+        [HttpPut(Router.StudentRouter.UpdateStudent)]
         public async Task<IActionResult> UpdateStudent(int id, [FromBody] UpdateStudentDto request)
         {
             request.Id = id;
@@ -42,7 +33,7 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpDelete(Router.DeleteStudent)]
+        [HttpDelete(Router.StudentRouter.DeleteStudent)]
         public async Task<IActionResult> DeleteStudent(int id)
         {
             var request = new DeleteStudentDto { Id = id };
@@ -50,33 +41,18 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpGet(Router.SearchStudents)]
-        public async Task<IActionResult> SearchStudents([FromQuery] string? name = null, [FromQuery] int age = 0)
+        [HttpGet(Router.StudentRouter.SearchStudents)]
+        public async Task<IActionResult> SearchStudents([FromQuery] string? name = null, [FromQuery] int age = 0, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var studentDto = new StudentDto
+            var request = new SearchStudentsRequest
             {
-                Sname = name ?? "",
-                Age = age
+                Name = name,
+                Age = age,
+                PageNumber = pageNumber,
+                PageSize = pageSize
             };
 
-            var specification = new StudentSpecification(studentDto);
-            var students = await _studentRepository.GetBySpecification(specification);
-
-            var response = new Response
-            {
-                Status = true,
-                StatusCode = HttpStatusCode.OK,
-                Message = $"Found {students.Count} students matching criteria",
-                Data = students.Select(s => new
-                {
-                    s.Id,
-                    s.SID,
-                    s.Sname,
-                    s.Age,
-                    EnrolledCourses = s.Learns?.Count ?? 0
-                })
-            };
-
+            var response = await mediator.Send(request);
             return Result(response);
         }
     }

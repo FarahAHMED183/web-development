@@ -15,92 +15,59 @@ namespace CRUD_Operation.Features.Student.Command.Handler
 
         public async Task<Response> Handle(StudentDto request, CancellationToken cancellationToken)
         {
-            try
+            var student = _mapper.Map<StudentEntity>(request);
+            await _studentRepository.Create(student);
+            
+            return new Response
             {
-                var student = _mapper.Map<StudentEntity>(request);
-                await _studentRepository.Create(student);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.Created,
-                    Message = "Student created successfully",
-                    Data = student
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error creating student: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.Created,
+                Message = "Student created successfully",
+                Data = student
+            };
         }
 
         public async Task<Response> Handle(UpdateStudentDto request, CancellationToken cancellationToken)
         {
-            try
+            var existingStudent = await _studentRepository.GetById(request.Id);
+            if (existingStudent == null)
             {
-                var existingStudent = await _studentRepository.GetById(request.Id);
-                if (existingStudent == null)
+                return new Response
                 {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Student not found"
-                    };
-                }
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Student not found"
+                };
+            }
 
-                _mapper.Map(request, existingStudent);
-                await _studentRepository.Update(existingStudent);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Student updated successfully",
-                    Data = existingStudent
-                };
-            }
-            catch (Exception ex)
+            _mapper.Map(request, existingStudent);
+            await _studentRepository.Update(existingStudent);
+            
+            return new Response
             {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error updating student: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Student updated successfully",
+                Data = existingStudent
+            };
         }
 
         public async Task<Response> Handle(DeleteStudentDto request, CancellationToken cancellationToken)
         {
-            try
+            var student = await _studentRepository.GetById(request.Id);
+            if (student == null)
             {
-                var student = await _studentRepository.GetById(request.Id);
-                if (student == null)
+                return new Response
                 {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Student not found"
-                    };
-                }
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Student not found"
+                };
+            }
 
-                await _studentRepository.Delete(student);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Student deleted successfully"
-                };
-            }
-            catch (Exception ex)
+            await _studentRepository.Delete(student);
+            
+            return new Response
             {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error deleting student: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Student deleted successfully"
+            };
         }
     }
 }

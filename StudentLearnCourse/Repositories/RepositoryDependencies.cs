@@ -11,10 +11,14 @@
             // Get Validators
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            // Student-Course-Learn repositories
-            services.AddScoped<IStudentRepository, StudentRepository>();
+            // Register generic repository for all entities
+            services.AddScoped(typeof(Repositories.Interfaces.IGenericRepository<>), typeof(Implementations.GenericRepository<>));
+            
+            // Register specific repositories
             services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ILearnRepository, LearnRepository>();
+            
             return services;
         }
     }

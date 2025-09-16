@@ -15,92 +15,59 @@ namespace CRUD_Operation.Features.Course.Command.Handler
 
         public async Task<Response> Handle(CourseDto request, CancellationToken cancellationToken)
         {
-            try
+            var course = _mapper.Map<CourseEntity>(request);
+            await _courseRepository.Create(course);
+            
+            return new Response
             {
-                var course = _mapper.Map<CourseEntity>(request);
-                await _courseRepository.Create(course);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.Created,
-                    Message = "Course created successfully",
-                    Data = course
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error creating course: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.Created,
+                Message = "Course created successfully",
+                Data = course
+            };
         }
 
         public async Task<Response> Handle(UpdateCourseDto request, CancellationToken cancellationToken)
         {
-            try
+            var existingCourse = await _courseRepository.GetById(request.Id);
+            if (existingCourse == null)
             {
-                var existingCourse = await _courseRepository.GetById(request.Id);
-                if (existingCourse == null)
+                return new Response
                 {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Course not found"
-                    };
-                }
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Course not found"
+                };
+            }
 
-                _mapper.Map(request, existingCourse);
-                await _courseRepository.Update(existingCourse);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Course updated successfully",
-                    Data = existingCourse
-                };
-            }
-            catch (Exception ex)
+            _mapper.Map(request, existingCourse);
+            await _courseRepository.Update(existingCourse);
+            
+            return new Response
             {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error updating course: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Course updated successfully",
+                Data = existingCourse
+            };
         }
 
         public async Task<Response> Handle(DeleteCourseDto request, CancellationToken cancellationToken)
         {
-            try
+            var course = await _courseRepository.GetById(request.Id);
+            if (course == null)
             {
-                var course = await _courseRepository.GetById(request.Id);
-                if (course == null)
+                return new Response
                 {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Course not found"
-                    };
-                }
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Course not found"
+                };
+            }
 
-                await _courseRepository.Delete(course);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Course deleted successfully"
-                };
-            }
-            catch (Exception ex)
+            await _courseRepository.Delete(course);
+            
+            return new Response
             {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error deleting course: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Course deleted successfully"
+            };
         }
     }
 }

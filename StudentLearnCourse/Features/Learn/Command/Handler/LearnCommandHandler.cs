@@ -23,125 +23,92 @@ namespace CRUD_Operation.Features.Learn.Command.Handler
 
         public async Task<Response> Handle(EnrollStudentDto request, CancellationToken cancellationToken)
         {
-            try
+            // Check if student exists
+            var student = await _studentRepository.GetById(request.StudentId);
+            if (student == null)
             {
-                // Check if student exists
-                var student = await _studentRepository.GetById(request.StudentId);
-                if (student == null)
-                {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Student not found"
-                    };
-                }
-
-                // Check if course exists
-                var course = await _courseRepository.GetById(request.CourseId);
-                if (course == null)
-                {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Course not found"
-                    };
-                }
-
-                // Check if already enrolled
-                var isAlreadyEnrolled = await _learnRepository.IsStudentEnrolledInCourseAsync(request.StudentId, request.CourseId);
-                if (isAlreadyEnrolled)
-                {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.BadRequest,
-                        Message = "Student is already enrolled in this course"
-                    };
-                }
-
-                var enrollment = _mapper.Map<LearnEntity>(request);
-                await _learnRepository.Create(enrollment);
-                
                 return new Response
                 {
-                    StatusCode = HttpStatusCode.Created,
-                    Message = "Student enrolled successfully",
-                    Data = enrollment
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Student not found"
                 };
             }
-            catch (Exception ex)
+
+            // Check if course exists
+            var course = await _courseRepository.GetById(request.CourseId);
+            if (course == null)
+            {
+                return new Response
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Course not found"
+                };
+            }
+
+            // Check if already enrolled
+            var isAlreadyEnrolled = await _learnRepository.IsStudentEnrolledInCourseAsync(request.StudentId, request.CourseId);
+            if (isAlreadyEnrolled)
             {
                 return new Response
                 {
                     StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error enrolling student: {ex.Message}"
+                    Message = "Student is already enrolled in this course"
                 };
             }
+
+            var enrollment = _mapper.Map<LearnEntity>(request);
+            await _learnRepository.Create(enrollment);
+            
+            return new Response
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Student enrolled successfully",
+                Data = enrollment
+            };
         }
 
         public async Task<Response> Handle(UnenrollStudentDto request, CancellationToken cancellationToken)
         {
-            try
+            var enrollment = await _learnRepository.GetLearnByStudentAndCourseAsync(request.StudentId, request.CourseId);
+            if (enrollment == null)
             {
-                var enrollment = await _learnRepository.GetLearnByStudentAndCourseAsync(request.StudentId, request.CourseId);
-                if (enrollment == null)
+                return new Response
                 {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Enrollment not found"
-                    };
-                }
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Enrollment not found"
+                };
+            }
 
-                await _learnRepository.Delete(enrollment);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Student unenrolled successfully"
-                };
-            }
-            catch (Exception ex)
+            await _learnRepository.Delete(enrollment);
+            
+            return new Response
             {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error unenrolling student: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Student unenrolled successfully"
+            };
         }
 
         public async Task<Response> Handle(UpdateGradeDto request, CancellationToken cancellationToken)
         {
-            try
+            var enrollment = await _learnRepository.GetLearnByStudentAndCourseAsync(request.StudentId, request.CourseId);
+            if (enrollment == null)
             {
-                var enrollment = await _learnRepository.GetLearnByStudentAndCourseAsync(request.StudentId, request.CourseId);
-                if (enrollment == null)
+                return new Response
                 {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Enrollment not found"
-                    };
-                }
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Enrollment not found"
+                };
+            }
 
-                enrollment.Grade = request.Grade;
-                await _learnRepository.Update(enrollment);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Grade updated successfully",
-                    Data = enrollment
-                };
-            }
-            catch (Exception ex)
+            enrollment.Grade = request.Grade;
+            await _learnRepository.Update(enrollment);
+            
+            return new Response
             {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error updating grade: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Grade updated successfully",
+                Data = enrollment
+            };
         }
     }
 }
