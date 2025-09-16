@@ -16,59 +16,44 @@ namespace CRUD_Operation.Features.Student.Query.Handler
 
         public async Task<Response> Handle(GetAllStudentsDto request, CancellationToken cancellationToken)
         {
-            try
+            var studentsResult = await _studentRepository.GetStudentsWithCoursesPagedAsync(request.PageNumber, request.PageSize);
+            var studentsDto = _mapper.Map<List<StudentWithCoursesDto>>(studentsResult.Items);
+            
+            var paginatedResult = new PaginatedResult<StudentWithCoursesDto>(
+                studentsDto,
+                studentsResult.PageNumber,
+                studentsResult.PageSize,
+                studentsResult.TotalRecords,
+                studentsResult.TotalPages);
+            
+            return new Response
             {
-                var students = await _studentRepository.GetStudentsWithCoursesAsync();
-                var studentsDto = _mapper.Map<List<StudentWithCoursesDto>>(students);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Students retrieved successfully",
-                    Data = studentsDto
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error retrieving students: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Students retrieved successfully",
+                Data = paginatedResult
+            };
         }
 
         public async Task<Response> Handle(GetStudentByIdDto request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var student = await _studentRepository.GetStudentWithCoursesByIdAsync(request.Id);
-                if (student == null)
-                {
-                    return new Response
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Student not found"
-                    };
-                }
-
-                var studentDto = _mapper.Map<StudentWithCoursesDto>(student);
-
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Student retrieved successfully",
-                    Data = studentDto
-                };
-            }
-            catch (Exception ex)
+            var student = await _studentRepository.GetStudentWithCoursesByIdAsync(request.Id);
+            if (student == null)
             {
                 return new Response
                 {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error retrieving student: {ex.Message}"
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Student not found"
                 };
             }
+
+            var studentDto = _mapper.Map<StudentWithCoursesDto>(student);
+
+            return new Response
+            {
+                StatusCode = HttpStatusCode.OK,
+                Message = "Student retrieved successfully",
+                Data = studentDto
+            };
         }
     }
 }

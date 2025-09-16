@@ -15,71 +15,45 @@ namespace CRUD_Operation.Features.Learn.Query.Handler
 
         public async Task<Response> Handle(GetAllEnrollmentsDto request, CancellationToken cancellationToken)
         {
-            try
+            var enrollmentsResult = await _learnRepository.GetLearnsWithDetailsPagedAsync(request.PageNumber, request.PageSize);
+            
+            var paginatedResult = new PaginatedResult<LearnEntity>(
+                enrollmentsResult.Items,
+                enrollmentsResult.PageNumber,
+                enrollmentsResult.PageSize,
+                enrollmentsResult.TotalRecords,
+                enrollmentsResult.TotalPages);
+            
+            return new Response
             {
-                var enrollments = await _learnRepository.GetLearnsWithDetailsAsync();
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Enrollments retrieved successfully",
-                    Data = enrollments
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error retrieving enrollments: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Enrollments retrieved successfully",
+                Data = paginatedResult
+            };
         }
 
         public async Task<Response> Handle(GetEnrollmentsByStudentDto request, CancellationToken cancellationToken)
         {
-            try
+            var enrollments = await _learnRepository.GetLearnsByStudentIdAsync(request.StudentId);
+            
+            return new Response
             {
-                var enrollments = await _learnRepository.GetLearnsByStudentIdAsync(request.StudentId);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Student enrollments retrieved successfully",
-                    Data = enrollments
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error retrieving student enrollments: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Student enrollments retrieved successfully",
+                Data = enrollments
+            };
         }
 
         public async Task<Response> Handle(GetEnrollmentsByCourseDto request, CancellationToken cancellationToken)
         {
-            try
+            var enrollments = await _learnRepository.GetLearnsByCourseIdAsync(request.CourseId);
+            
+            return new Response
             {
-                var enrollments = await _learnRepository.GetLearnsByCourseIdAsync(request.CourseId);
-                
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Course enrollments retrieved successfully",
-                    Data = enrollments
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Response
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = $"Error retrieving course enrollments: {ex.Message}"
-                };
-            }
+                StatusCode = HttpStatusCode.OK,
+                Message = "Course enrollments retrieved successfully",
+                Data = enrollments
+            };
         }
     }
 }

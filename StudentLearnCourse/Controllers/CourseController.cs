@@ -1,25 +1,16 @@
 namespace CRUD_Operation.Controllers
 {
-    [Route(Router.CourseController)]
     [ApiController]
     public class CourseController : BaseController
     {
-        private readonly ICourseRepository _courseRepository;
-
-        public CourseController(ICourseRepository courseRepository)
+        [HttpGet(Router.CourseRouter.GetAll)]
+        public async Task<IActionResult> GetAllCourses([FromQuery] GetAllCoursesDto request)
         {
-            _courseRepository = courseRepository;
-        }
-
-        [HttpGet(Router.GetAllCourses)]
-        public async Task<IActionResult> GetAllCourses()
-        {
-            var request = new GetAllCoursesDto();
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpGet(Router.GetCourseById)]
+        [HttpGet(Router.CourseRouter.GetById)]
         public async Task<IActionResult> GetCourseById(int id)
         {
             var request = new GetCourseByIdDto { Id = id };
@@ -27,14 +18,14 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpPost(Router.CreateCourse)]
+        [HttpPost(Router.CourseRouter.Create)]
         public async Task<IActionResult> CreateCourse([FromBody] CourseDto request)
         {
             var response = await mediator.Send(request);
             return Result(response);
         }
 
-        [HttpPut(Router.UpdateCourse)]
+        [HttpPut(Router.CourseRouter.Update)]
         public async Task<IActionResult> UpdateCourse(int id, [FromBody] UpdateCourseDto request)
         {
             request.Id = id;
@@ -42,7 +33,7 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpDelete(Router.DeleteCourse)]
+        [HttpDelete(Router.CourseRouter.Delete)]
         public async Task<IActionResult> DeleteCourse(int id)
         {
             var request = new DeleteCourseDto { Id = id };
@@ -50,33 +41,22 @@ namespace CRUD_Operation.Controllers
             return Result(response);
         }
 
-        [HttpGet(Router.SearchCourses)]
-        public async Task<IActionResult> SearchCourses([FromQuery] string? name = null, [FromQuery] int hours = 0)
+        [HttpGet(Router.CourseRouter.Search)]
+        public async Task<IActionResult> SearchCourses(
+            [FromQuery] string? name = null,
+            [FromQuery] int? hours = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var courseDto = new CourseDto
+            var request = new SearchCoursesRequest
             {
-                Cname = name ?? "",
-                Hours = hours
+                Name = name,
+                Hours = hours,
+                PageNumber = pageNumber,
+                PageSize = pageSize
             };
 
-            var specification = new CourseSpecification(courseDto);
-            var courses = await _courseRepository.GetBySpecification(specification);
-
-            var response = new Response
-            {
-                Status = true,
-                StatusCode = HttpStatusCode.OK,
-                Message = $"Found {courses.Count} courses matching criteria",
-                Data = courses.Select(c => new
-                {
-                    c.Id,
-                    c.Code,
-                    c.Cname,
-                    c.Hours,
-                    EnrolledStudents = c.Learns?.Count ?? 0
-                })
-            };
-
+            var response = await mediator.Send(request);
             return Result(response);
         }
     }

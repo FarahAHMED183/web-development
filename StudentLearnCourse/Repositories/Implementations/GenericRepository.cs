@@ -64,5 +64,42 @@
             
             return await query.CountAsync();
         }
+    
+
+        public async Task<Global.PaginatedResult<TEntity>> GetPagedAsync(int pageNumber, int pageSize, IBaseSpecification<TEntity>? specification = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+
+            // Apply specification criteria
+            if (specification != null && specification.Criterias != null && specification.Criterias.Any())
+            {
+                foreach (var criteria in specification.Criterias)
+                {
+                    query = query.Where(criteria);
+                }
+            }
+
+            // Includes
+            if (specification != null && specification.Includes != null && specification.Includes.Any())
+            {
+                foreach (var include in specification.Includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            // Ordering
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            var totalRecords = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new Global.PaginatedResult<TEntity>(items, pageNumber, pageSize, totalRecords, totalPages);
+        }
+
     }
 }
